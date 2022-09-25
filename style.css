@@ -5,6 +5,7 @@
   font-family: "Poppins", sans-serif;
 }
 
+
 body {
   min-height: 100vh;
   min-width: 100vw;
@@ -54,6 +55,7 @@ header {
 }
 
 .header-logo {
+  cursor: pointer;
   height: 24px;
   width: 24px;
 }
