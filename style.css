@@ -1,0 +1,156 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  min-width: 100vw;
+  padding: 24px 16px;
+
+  /* Layout */
+  --dark-text: #212121;
+  --medium-text: #666666;
+  --light-text: #e0e0e0;
+  --white-text: #ffffff;
+  --medium-background: #f7f7f7;
+  --white-background: #ffffff;
+  --wireframe: #b8b8b8;
+
+  /* Pokémon type colors */
+  --fire: #f57d31;
+  --grass: #74cb48;
+  --water: #6493eb;
+  --bug: #a7b723;
+  --electric: #f9cf30;
+  --ghost: #70559b;
+  --normal: #aaa67f;
+  --psychic: #fb5584;
+  --steel: #b7b9d0;
+  --poison: #a43e9e;
+  --ground: #dec16b;
+  --rock: #b69e31;
+  --ice: #9ad6df;
+  --dark: #75574c;
+  --dragon: #7037ff;
+  --flying: #a891ec;
+  --fighting: #c12239;
+  --fairy: #e69eac;
+
+  background-color: var(--medium-background);
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-upper-part {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-logo {
+  height: 24px;
+  width: 24px;
+}
+
+.header-logo > img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.header-button {
+  display: flex;
+  justify-content: space-between;
+  width: 24px
+}
+
+.header-button > img {
+  width: 45%;
+}
+
+.header-button > img:hover {
+  cursor: pointer;
+}
+
+.header-lower-part > input {
+  width: 100%;
+}
+
+section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+a {
+  all: unset;
+}
+
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-wrapper:hover {
+  cursor: pointer;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 104px;
+  height: 88px;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid var(--normal);
+  padding: 4px 8px;
+}
+
+.card-id {
+  font-size: 8px;
+  font-weight: 400;
+  text-align: right;
+  color: var(--normal);
+}
+
+.card-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-image > img {
+  width: 72px;
+  height: 72px;
+}
+
+.card-name {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 24px;
+  background-color: var(--normal);
+  border-radius: 0 0 8px 8px;
+  color: var(--white-text);
+  font-size: 10px;
+  font-weight: 400;
+  text-align: center;
+}
+
+
+.flip {
+  transform: rotate(180deg);
+}
