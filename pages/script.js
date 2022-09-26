@@ -17,7 +17,7 @@ async function main() {
     const { id } = getQueryParams(window.location.href);
 
     if (!pokemonArray || !pokemonArray.lenght) {
-        response = await getPokemon(id)
+        response = await getPokemon(id);
     } else {
         response = pokemonArray.find((pokemon) => pokemon.id == id);
     }
@@ -84,7 +84,7 @@ function createPage(pokemon) {
     pokemonHeight.innerHTML = `${(pokemon.height * 0.1).toFixed(1)} m`;
     pokemonDescription.innerHTML = pokemon.description;
     pokemon.types.forEach(t => pokemonTypes.innerHTML += `<div style="background-color: var(--${t.type.name})" class="type">${capitalize(t.type.name)}</div>`)
-    pokemon.abilities.forEach(a => pokemonAbilities.innerHTML += `<span class="pokemon-ability">${capitalize(a.ability.name)}</span>`)
+    pokemon.abilities.forEach((a, index) => index <= 1 ? pokemonAbilities.innerHTML += `<span class="pokemon-ability">${capitalize(a.ability.name)}</span>` : undefined)
     pokemon.stats.forEach(stat => {
         const statPercentage = (stat.value * 100) / 255;
 
