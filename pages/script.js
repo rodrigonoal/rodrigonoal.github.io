@@ -5,6 +5,7 @@ const pokemonId = document.querySelector(".pokemon-id")
 const pokemonImage = document.querySelector(".pokemon-image")
 const pokemonTypes = document.querySelector(".pokemon-types")
 const pokemonAbilities = document.querySelector(".pokemon-abilities")
+const pokemonDescription = document.querySelector(".pokemon-description")
 const pokemonStats = document.querySelector(".pokemon-stats")
 const pokemonWeight = document.querySelector(".pokemon-weight")
 const pokemonHeight = document.querySelector(".pokemon-height")
@@ -31,6 +32,8 @@ async function getPokemon(id) {
 async function pokemonToModelDT(pokemonResponse) {
     const { name, id, height, weight, abilities, types, stats } = pokemonResponse;
     const image = pokemonResponse.sprites.other['official-artwork'].front_default;
+    const descriptionResponse = await (await fetch(pokemonResponse.species.url)).json();
+    const description = descriptionResponse.flavor_text_entries[9].flavor_text;
 
     return {
         id,
@@ -40,7 +43,7 @@ async function pokemonToModelDT(pokemonResponse) {
         height,
         types,
         abilities,
-        description: "",
+        description,
         stats: [
             {
                 name: "hp",
@@ -69,9 +72,10 @@ async function pokemonToModelDT(pokemonResponse) {
 function createPage(pokemon) {
     pokemonName.innerHTML = capitalize(pokemon.name);
     pokemonId.innerHTML = formatNumber(pokemon.id).padStart(4, '#');
-    pokemonImage.innerHTML = `<img alt='${pokemon.name}' src='${pokemon.image}'>`
-    pokemonWeight.innerHTML = `${(pokemon.weight * 0.1).toFixed(1)} kg`
-    pokemonHeight.innerHTML = `${(pokemon.height * 0.1).toFixed(1)} m`
+    pokemonImage.innerHTML = `<img alt='${pokemon.name}' src='${pokemon.image}'>`;
+    pokemonWeight.innerHTML = `${(pokemon.weight * 0.1).toFixed(1)} kg`;
+    pokemonHeight.innerHTML = `${(pokemon.height * 0.1).toFixed(1)} m`;
+    pokemonDescription.innerHTML = pokemon.description;
     pokemon.types.forEach(t => pokemonTypes.innerHTML += `<div style="background-color: var(--${t.type.name})" class="type">${capitalize(t.type.name)}</div>`)
     pokemon.abilities.forEach(a => pokemonAbilities.innerHTML += `<span class="pokemon-ability">${capitalize(a.ability.name)}</span>`)
     pokemon.stats.forEach(stat => {
