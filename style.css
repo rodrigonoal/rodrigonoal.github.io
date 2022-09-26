@@ -5,7 +5,6 @@
   font-family: "Poppins", sans-serif;
 }
 
-
 body {
   min-height: 100vh;
   min-width: 100vw;
@@ -74,7 +73,7 @@ header {
 .header-button {
   display: flex;
   justify-content: space-between;
-  width: 24px
+  width: 24px;
 }
 
 .header-button > img {
@@ -85,9 +84,20 @@ header {
   cursor: pointer;
 }
 
+.header-lower-part {
+  position: relative;
+}
+
+.header-lower-part > img {
+  position: absolute;
+  top: 32%;
+  left: 2%;
+}
+
 .header-lower-part > input {
   width: 100%;
 }
+
 
 section {
   display: flex;
@@ -153,7 +163,23 @@ a {
   text-align: center;
 }
 
-
 .flip {
   transform: rotate(180deg);
+}
+
+.search-box {
+  display: flex;
+  flex-direction: row;
+  padding: 4px 8px;
+  gap: 16px;
+  width: 328px;
+  height: 24px;
+  background: var(--white-background);
+  border: 1px solid var(--light-text);
+  border-radius: 8px;
+  padding-left: 20px;
+}
+
+.search-box:placeholder-shown {
+  text-align: center;
 }
