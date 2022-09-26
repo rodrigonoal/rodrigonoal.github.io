@@ -53,11 +53,17 @@ searchBox.addEventListener("keydown", () => {
 
 
 async function main() {
+    pokemonArray = JSON.parse(localStorage.getItem('pokemonArray'));
+
     if (!pokemonArray || !pokemonArray.lenght) {
         const response = await getPokemon();
-        const tempPokemon = [...response.results];
+        const tempPokemon = await Promise.all(response.results.map(async pokemon => await getPokemon(pokemon.name)));
 
-        pokemonArray = await Promise.all(tempPokemon.map(async pokemon => await getPokemon(pokemon.name)));
+        pokemonArray = tempPokemon.map(pokemon => {
+            const { name, id, height, weight, abilities, types, stats, sprites, species } = pokemon;
+            return { name, id, height, weight, abilities, types, stats, sprites, species }
+        })
+        localStorage.setItem("pokemonArray", JSON.stringify(pokemonArray));
     }
 
     displayedPokemon = [...pokemonArray]

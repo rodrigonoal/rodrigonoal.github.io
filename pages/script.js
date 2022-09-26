@@ -1,4 +1,5 @@
 let pokemon;
+let response;
 
 const pokemonName = document.querySelector(".pokemon-name")
 const pokemonId = document.querySelector(".pokemon-id")
@@ -12,8 +13,14 @@ const pokemonHeight = document.querySelector(".pokemon-height")
 
 
 async function main() {
+    const pokemonArray = JSON.parse(localStorage.getItem('pokemonArray'));
     const { id } = getQueryParams(window.location.href);
-    const response = await getPokemon(id)
+
+    if (!pokemonArray || !pokemonArray.lenght) {
+        response = await getPokemon(id)
+    } else {
+        response = pokemonArray.find((pokemon) => pokemon.id == id);
+    }
 
     pokemon = await pokemonToModelDT(response);
 
