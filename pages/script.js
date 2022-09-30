@@ -27,10 +27,12 @@ async function main() {
     createPage(pokemon);
 }
 
-async function getPokemon(id) {
-    const pokeApiBaseUrl = "https://pokeapi.co/api/v2/pokemon/";
 
-    const url = `${pokeApiBaseUrl}${id}`;
+// Service & Service Manipulation
+async function getPokemon(id) {
+    const pokeApiBaseUrl = "https://pokeapi.co/api/v2/pokemon";
+
+    const url = `${pokeApiBaseUrl}/${id}`;
     const response = await (await fetch(url)).json();
 
     return response;
@@ -76,8 +78,10 @@ async function pokemonToModelDT(pokemonResponse) {
 
 }
 
+
+// DOM Manipulation 
 function createPage(pokemon) {
-    pokemonName.innerHTML = capitalize(pokemon.name);
+    pokemonName.innerHTML = capitalize(pokemon.name.split('-')[0]);
     pokemonId.innerHTML = formatNumber(pokemon.id).padStart(4, '#');
     pokemonImage.innerHTML = `<img alt='${pokemon.name}' src='${pokemon.image}'>`;
     pokemonWeight.innerHTML = `${(pokemon.weight * 0.1).toFixed(1)} kg`;
@@ -115,16 +119,8 @@ function createPage(pokemon) {
 
 }
 
-function getQueryParams(url) {
-    const paramArr = url.slice(url.indexOf('?') + 1).split('&');
-    const params = {};
-    paramArr.map(param => {
-        const [key, val] = param.split('=');
-        params[key] = decodeURIComponent(val);
-    })
-    return params;
-}
 
+// Utils
 function capitalize(string) {
     return string[0].toUpperCase() + string.slice(1)
 };
@@ -137,4 +133,12 @@ function getTypeColor(pokemon) {
     return `var(--${pokemon.types[0].type.name})`
 };
 
-
+function getQueryParams(url) {
+    const paramArr = url.slice(url.indexOf('?') + 1).split('&');
+    const params = {};
+    paramArr.map(param => {
+        const [key, val] = param.split('=');
+        params[key] = decodeURIComponent(val);
+    })
+    return params;
+}

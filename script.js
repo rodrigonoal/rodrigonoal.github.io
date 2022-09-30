@@ -10,34 +10,6 @@ const searchBox = document.querySelector(".search-box");
 const generationSelect = document.querySelector(".gen-select");
 
 
-order.addEventListener("click", () => {
-    alphabetical = !alphabetical;
-
-    displayPokemon();
-})
-
-arrow.addEventListener("click", () => {
-    crescentOrder = !crescentOrder;
-
-    displayPokemon();
-})
-
-searchBox.addEventListener("keydown", () => {
-    setTimeout(() => {
-        const searchText = searchBox.value.toUpperCase();
-
-        if (!searchText) {
-            return main()
-        }
-
-        displayedPokemon = pokemonArray.filter(pokemon => pokemon.name.toUpperCase().includes(searchText));
-        displayPokemon();
-    }, 550)
-})
-
-generationSelect.addEventListener("change", () => window.location.href = `index.html?gen=${generationSelect.value}`);
-
-
 async function main() {
     pokemonArray = JSON.parse(localStorage.getItem('pokemonArray'));
 
@@ -58,6 +30,37 @@ async function main() {
     displayPokemon();
 }
 
+
+// Events
+order.addEventListener("click", () => {
+    alphabetical = !alphabetical;
+
+    displayPokemon();
+})
+
+arrow.addEventListener("click", () => {
+    crescentOrder = !crescentOrder;
+
+    displayPokemon();
+})
+
+searchBox.addEventListener("keydown", () => {
+    setTimeout(() => {
+        const searchText = searchBox.value.toUpperCase();
+
+        if (!searchText) {
+            return main();
+        }
+
+        displayedPokemon = pokemonArray.filter(pokemon => pokemon.name.toUpperCase().includes(searchText));
+        displayPokemon();
+    }, 550)
+})
+
+generationSelect.addEventListener("change", () => window.location.href = `index.html?gen=${generationSelect.value}`);
+
+
+// Service & Service Manipulation
 async function getPokemon(id) {
     const pokeApiBaseUrl = "https://pokeapi.co/api/v2/pokemon";
     let params;
@@ -129,16 +132,21 @@ function findGeneration() {
     return generations.find(generation => generation.number == gen);
 }
 
+
+// Dom Manipulation
 function displayPokemon() {
     clearPokedex();
 
     if (crescentOrder) {
         arrow.alt = "crescent";
-        arrow.classList.add('flip');
+        arrow.classList.remove('down');
+        arrow.classList.add('up');
 
     } else {
         arrow.alt = "decrescent";
-        arrow.classList.remove('flip');
+        arrow.classList.remove('up');
+        arrow.classList.add('down');
+
     }
 
     if (alphabetical) {
@@ -168,7 +176,6 @@ function displayPokemon() {
 
     displayedPokemon.forEach(pokemon => section.appendChild(createCard(pokemon)));
 }
-
 
 function createCard(pokemon) {
     const typeColor = getTypeColor(pokemon);
@@ -206,8 +213,10 @@ function createCard(pokemon) {
     return cardWrapper;
 }
 
+
+// Utils
 function capitalize(string) {
-    return string[0].toUpperCase() + string.slice(1)
+    return string[0].toUpperCase() + string.slice(1);
 };
 
 function formatNumber(number) {
@@ -215,13 +224,12 @@ function formatNumber(number) {
 };
 
 function getTypeColor(pokemon) {
-    return `var(--${pokemon.types[0].type.name})`
+    return `var(--${pokemon.types[0].type.name})`;
 };
 
 function clearPokedex() {
     section.innerHTML = "";
 }
-
 
 function getQueryParams(url) {
     const paramArr = url.slice(url.indexOf('?') + 1).split('&');

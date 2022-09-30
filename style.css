@@ -169,8 +169,12 @@ a {
   text-align: center;
 }
 
-.flip {
+.up {
   transform: rotate(180deg);
+}
+
+.down {
+  transform: rotate(0deg);
 }
 
 .search-box {
