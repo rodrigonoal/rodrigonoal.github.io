@@ -40,7 +40,7 @@ async function pokemonToModelDT(pokemonResponse) {
     const { name, id, height, weight, abilities, types, stats } = pokemonResponse;
     const image = pokemonResponse.sprites.other['official-artwork'].front_default;
     const descriptionResponse = await (await fetch(pokemonResponse.species.url)).json();
-    const description = descriptionResponse.flavor_text_entries[9].flavor_text;
+     const description = descriptionResponse.flavor_text_entries.findLast(entry => entry.language.name === "en").flavor_text;
 
     return {
         id,
