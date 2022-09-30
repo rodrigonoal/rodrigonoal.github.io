@@ -170,6 +170,7 @@ a {
 }
 
 .pokemon-description {
+  text-align: center;
   font-size: 10px;
   font-weight: 400;
   color: var(--dark-text);
