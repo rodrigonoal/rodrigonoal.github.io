@@ -40,13 +40,13 @@ arrow.addEventListener("click", () => {
 
 searchBox.addEventListener("keydown", () => {
     setTimeout(() => {
-        const searchText = searchBox.value;
+        const searchText = searchBox.value.toUpperCase();
 
         if (!searchText) {
             return main()
         }
 
-        displayedPokemon = pokemonArray.filter(pokemon => pokemon.name.includes(searchText));
+        displayedPokemon = pokemonArray.filter(pokemon => pokemon.name.toUpperCase().includes(searchText));
         displayPokemon();
     }, 500)
 })
