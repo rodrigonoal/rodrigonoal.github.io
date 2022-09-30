@@ -83,7 +83,7 @@ async function getPokemon(name) {
 };
 
 function findGeneration() {
-    const { gen } = getQueryParams(window.location.href);
+    let { gen } = getQueryParams(window.location.href);
 
     const gens = [{
         number: 1,
@@ -126,7 +126,13 @@ function findGeneration() {
         limit: 96
     }]
 
-    return gens.find(generation => generation.number == (gen ?? 1));
+    if (!gen) {
+        gen = localStorage.getItem('gen')
+    } else {
+        localStorage.setItem("gen", gen)
+    }
+
+    return gens.find(generation => generation.number == (gen || 1));
 }
 
 function displayPokemon() {
