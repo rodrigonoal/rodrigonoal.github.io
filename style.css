@@ -60,11 +60,11 @@ select {
 }
 
 .header-logo {
-  cursor: pointer;
   width: 62px;  
 }
 
 .header-logo > img {
+  cursor: pointer;
   height: 24px;
   width: 24px;
   object-fit: cover;
