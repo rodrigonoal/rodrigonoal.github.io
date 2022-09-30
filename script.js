@@ -60,7 +60,8 @@ async function main() {
         const tempPokemon = await Promise.all(response.results.map(async pokemon => await getPokemon(pokemon.name)));
 
         pokemonArray = tempPokemon.map(pokemon => {
-            const { name, id, height, weight, abilities, types, stats, sprites, species } = pokemon;
+            const { id, height, weight, abilities, types, stats, sprites, species } = pokemon;
+            const name = pokemon.name.split('-')[0]
             return { name, id, height, weight, abilities, types, stats, sprites, species }
         })
         localStorage.setItem("pokemonArray", JSON.stringify(pokemonArray));
@@ -74,7 +75,50 @@ async function main() {
 async function getPokemon(name) {
     const pokeApiBaseUrl = "https://pokeapi.co/api/v2/pokemon/";
 
-    const url = `${pokeApiBaseUrl}${name || '?limit=151&offset=0'}`;
+    const gens = [{
+        number: 1,
+        offset: 0,
+        limit: 151
+    },
+    {
+        number: 2,
+        offset: 151,
+        limit: 100
+    },
+    {
+        number: 3,
+        offset: 251,
+        limit: 135
+    },
+    {
+        number: 4,
+        offset: 386,
+        limit: 107
+    },
+    {
+        number: 5,
+        offset: 493,
+        limit: 156
+    },
+    {
+        number: 6,
+        offset: 649,
+        limit: 72
+    },
+    {
+        number: 7,
+        offset: 721,
+        limit: 88
+    },
+    {
+        number: 8,
+        offset: 809,
+        limit: 96
+    }]
+
+    const gen = gens.find(gen => gen.number === 1)
+
+    const url = `${pokeApiBaseUrl}${name || `?limit=${gen.limit}&offset=${gen.offset}`}`;
     const response = await (await fetch(url)).json();
 
     return response;
