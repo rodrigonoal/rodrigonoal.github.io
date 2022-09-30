@@ -85,7 +85,7 @@ async function getPokemon(name) {
 function findGeneration() {
     let { gen } = getQueryParams(window.location.href);
 
-    const gens = [{
+    const generations = [{
         number: 1,
         offset: 0,
         limit: 151
@@ -132,7 +132,7 @@ function findGeneration() {
         localStorage.setItem("gen", gen)
     }
 
-    return gens.find(generation => generation.number == (gen || 1));
+    return generations.find(generation => generation.number == (gen || 1));
 }
 
 function displayPokemon() {
