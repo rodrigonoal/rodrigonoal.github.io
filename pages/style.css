@@ -80,18 +80,21 @@ a {
 
 .pokemon-image > img {
   position: absolute;
-  height: 200px;
-  width: 200px;
+  height: 210px;
+  width: 210px;
 }
 
 .pokemon-card {
   display: flex;
   flex-direction: column;
+  margin-right: auto;
+  margin-left: auto;
   height: 412px;
   border-radius: 8px;
   padding: 56px 20px 0 20px;
   background-color: var(--white-background);
   gap: 16px;
+  max-width: 300px;
 }
 
 .pokemon-types {
