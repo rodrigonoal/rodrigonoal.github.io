@@ -45,6 +45,17 @@ body {
 .container {
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.container > img {
+  position: absolute;
+  opacity: 1;
+  right: 0.1%;
+  top: 0.1%;
+  width: 208px;
+  height: 208px;
+  z-index: 0;
 }
 
 header {
@@ -52,6 +63,7 @@ header {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 54px;
+  z-index: 1;
 }
 
 a {
@@ -82,6 +94,7 @@ a {
   position: absolute;
   height: 210px;
   width: 210px;
+  z-index: 2;
 }
 
 .pokemon-card {
@@ -95,6 +108,7 @@ a {
   background-color: var(--white-background);
   gap: 16px;
   max-width: 300px;
+  z-index: 1;
 }
 
 .pokemon-types {
