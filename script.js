@@ -74,6 +74,16 @@ async function main() {
 
 async function getPokemon(name) {
     const pokeApiBaseUrl = "https://pokeapi.co/api/v2/pokemon/";
+    const gen = findGeneration();
+
+    const url = `${pokeApiBaseUrl}${name || `?limit=${gen.limit}&offset=${gen.offset}`}`;
+    const response = await (await fetch(url)).json();
+
+    return response;
+};
+
+function findGeneration() {
+    const { gen } = getQueryParams(window.location.href);
 
     const gens = [{
         number: 1,
@@ -116,13 +126,8 @@ async function getPokemon(name) {
         limit: 96
     }]
 
-    const gen = gens.find(gen => gen.number === 1)
-
-    const url = `${pokeApiBaseUrl}${name || `?limit=${gen.limit}&offset=${gen.offset}`}`;
-    const response = await (await fetch(url)).json();
-
-    return response;
-};
+    return gens.find(generation => generation.number == (gen ?? 1));
+}
 
 function displayPokemon() {
     clearPokedex();
@@ -209,4 +214,12 @@ function clearPokedex() {
 }
 
 
-
+function getQueryParams(url) {
+    const paramArr = url.slice(url.indexOf('?') + 1).split('&');
+    const params = {};
+    paramArr.map(param => {
+        const [key, val] = param.split('=');
+        params[key] = decodeURIComponent(val);
+    })
+    return params;
+}
