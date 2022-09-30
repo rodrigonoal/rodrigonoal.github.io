@@ -1,40 +1,24 @@
 let pokemonArray = [];
 let displayedPokemon = [];
-let crescentOrder = false;
-let alphabetical = false;
+let crescentOrder;
+let alphabetical;
 
 const section = document.querySelector("section");
 const order = document.querySelector(".order");
 const arrow = document.querySelector(".arrow");
 const searchBox = document.querySelector(".search-box");
+const generationSelect = document.querySelector(".gen-select");
+
 
 order.addEventListener("click", () => {
     alphabetical = !alphabetical;
 
-    if (alphabetical) {
-        order.alt = "alphabetical order";
-        order.src = "/images/alphabetical_order.svg";
-
-    } else {
-        order.alt = "numerical order";
-        order.src = "/images/numerical_order.svg";
-
-    }
     displayPokemon();
 })
 
 arrow.addEventListener("click", () => {
     crescentOrder = !crescentOrder;
 
-    if (crescentOrder) {
-        arrow.alt = "crescent";
-        arrow.classList.add('flip');
-
-    } else {
-        arrow.alt = "decrescent";
-        arrow.classList.remove('flip');
-
-    }
     displayPokemon();
 })
 
@@ -48,8 +32,10 @@ searchBox.addEventListener("keydown", () => {
 
         displayedPokemon = pokemonArray.filter(pokemon => pokemon.name.toUpperCase().includes(searchText));
         displayPokemon();
-    }, 500)
+    }, 550)
 })
+
+generationSelect.addEventListener("change", () => window.location.href = `index.html?gen=${generationSelect.value}`);
 
 
 async function main() {
@@ -61,8 +47,8 @@ async function main() {
 
         pokemonArray = tempPokemon.map(pokemon => {
             const { id, height, weight, abilities, types, stats, sprites, species } = pokemon;
-            const name = pokemon.name.split('-')[0]
-            return { name, id, height, weight, abilities, types, stats, sprites, species }
+            const name = pokemon.name.split('-')[0];
+            return { name, id, height, weight, abilities, types, stats, sprites, species };
         })
         localStorage.setItem("pokemonArray", JSON.stringify(pokemonArray));
     }
@@ -72,11 +58,19 @@ async function main() {
     displayPokemon();
 }
 
-async function getPokemon(name) {
-    const pokeApiBaseUrl = "https://pokeapi.co/api/v2/pokemon/";
-    const gen = findGeneration();
+async function getPokemon(id) {
+    const pokeApiBaseUrl = "https://pokeapi.co/api/v2/pokemon";
+    let params;
 
-    const url = `${pokeApiBaseUrl}${name || `?limit=${gen.limit}&offset=${gen.offset}`}`;
+    if (id) {
+        params = `/${id}`;
+
+    } else {
+        const gen = findGeneration();
+        params = `?limit=${gen.limit}&offset=${gen.offset}`
+    }
+
+    const url = `${pokeApiBaseUrl}${params}`;
     const response = await (await fetch(url)).json();
 
     return response;
@@ -124,19 +118,28 @@ function findGeneration() {
         number: 8,
         offset: 809,
         limit: 96
-    }]
+    }];
 
-    if (!gen) {
-        gen = localStorage.getItem('gen')
-    } else {
-        localStorage.setItem("gen", gen)
-    }
+    if (!gen) gen = localStorage.getItem('gen') || 1;
 
-    return generations.find(generation => generation.number == (gen || 1));
+    localStorage.setItem("gen", gen)
+
+    generationSelect.value = gen;
+
+    return generations.find(generation => generation.number == gen);
 }
 
 function displayPokemon() {
     clearPokedex();
+
+    if (crescentOrder) {
+        arrow.alt = "crescent";
+        arrow.classList.add('flip');
+
+    } else {
+        arrow.alt = "decrescent";
+        arrow.classList.remove('flip');
+    }
 
     if (alphabetical) {
         order.alt = "alphabetical order";
