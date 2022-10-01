@@ -21,9 +21,10 @@ async function main() {
 
     if (!pokemonArray || !pokemonArray.lenght) {
         const response = await getPokemon();
-        const tempPokemon = await Promise.all(response.results.map(async pokemon => await getPokemon(pokemon.name)));
+        pokemonArray = await Promise.all(response.results.map(async pokemon => {
+            return await pokemonDT(await getPokemon(pokemon.name))
+        }));
 
-        pokemonArray = tempPokemon.map(pokemonDT)
         await storePokemon(db, pokemonArray)
     }
 
@@ -38,7 +39,7 @@ async function createDB(db) {
 }
 
 async function storePokemon(db, array) {
-    await db.pokemon.bulkPut(array);
+    await db.pokemon.bulkPut(array)
 }
 
 async function getAllPokemon(db) {
@@ -52,8 +53,6 @@ async function getAllPokemon(db) {
 // Events
 order.addEventListener("click", () => {
     alphabetical = !alphabetical;
-
-    console.log(alphabetical)
 
     displayPokemon();
 })
@@ -152,6 +151,11 @@ function findGeneration() {
     return generations.find(generation => generation.number == gen);
 }
 
+async function downloadImage(url) { //not used
+    const blob = await (await fetch(url)).blob();
+    return blob;
+    // to use:   var objectURL = URL.createObjectURL(myBlob);
+}
 
 // Dom Manipulation
 function displayPokemon() {
@@ -261,7 +265,7 @@ function getQueryParams(url) {
     return params;
 }
 
-function pokemonDT(pokemon) {
+async function pokemonDT(pokemon) {
     const name = pokemon.name.split('-')[0];
     const { id, height, weight, abilities, types, stats, sprites, species } = pokemon;
     return { name, id, height, weight, abilities, types, stats, sprites, species };

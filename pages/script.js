@@ -95,7 +95,6 @@ async function pokemonToModelDT(pokemonResponse) {
 }
 
 async function getAbilityText(a) { //unused
-
     const response = await (await fetch(a.ability.url)).json();
     const entry = response.effect_entries.find(entry => entry.language.name === "en");
     return entry.effect;
