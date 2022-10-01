@@ -1,30 +1,46 @@
+import Dexie from "https://cdn.jsdelivr.net/npm/dexie@3.0.3/dist/dexie.mjs";
+
+const pokemonDescription = document.querySelector(".pokemon-description")
+const pokemonAbilities = document.querySelector(".pokemon-abilities")
+const pokemonWeight = document.querySelector(".pokemon-weight")
+const pokemonHeight = document.querySelector(".pokemon-height")
+const pokemonImage = document.querySelector(".pokemon-image")
+const pokemonTypes = document.querySelector(".pokemon-types")
+const pokemonStats = document.querySelector(".pokemon-stats")
+const pokemonName = document.querySelector(".pokemon-name")
+const pokemonId = document.querySelector(".pokemon-id")
+
 let pokemon;
 let response;
 
-const pokemonName = document.querySelector(".pokemon-name")
-const pokemonId = document.querySelector(".pokemon-id")
-const pokemonImage = document.querySelector(".pokemon-image")
-const pokemonTypes = document.querySelector(".pokemon-types")
-const pokemonAbilities = document.querySelector(".pokemon-abilities")
-const pokemonDescription = document.querySelector(".pokemon-description")
-const pokemonStats = document.querySelector(".pokemon-stats")
-const pokemonWeight = document.querySelector(".pokemon-weight")
-const pokemonHeight = document.querySelector(".pokemon-height")
+const db = await new Dexie("pokemonDB");
+await createDB(db);
 
+await main();
 
 async function main() {
-    const pokemonArray = JSON.parse(localStorage.getItem('pokemonArray'));
     const { id } = getQueryParams(window.location.href);
+    response = await getPokemonById(db, id)[0];
 
-    if (!pokemonArray || !pokemonArray.lenght) {
+    if (!response) {
         response = await getPokemon(id);
-    } else {
-        response = pokemonArray.find((pokemon) => pokemon.id == id);
     }
 
     pokemon = await pokemonToModelDT(response);
 
     createPage(pokemon);
+}
+
+
+// IndexDB
+async function createDB(db) {
+    await db.version(1).stores({ pokemon: "++id,name" })
+}
+
+async function getPokemonById(db, id) {
+    await db.open()
+    const pokemon = await db.pokemon.where("id").equals(id).toArray() || null;
+    return pokemon;
 }
 
 
@@ -42,7 +58,7 @@ async function pokemonToModelDT(pokemonResponse) {
     const { name, id, height, weight, abilities, types, stats } = pokemonResponse;
     const image = pokemonResponse.sprites.other['official-artwork'].front_default;
     const descriptionResponse = await (await fetch(pokemonResponse.species.url)).json();
-     const description = descriptionResponse.flavor_text_entries.findLast(entry => entry.language.name === "en").flavor_text;
+    const description = descriptionResponse.flavor_text_entries.findLast(entry => entry.language.name === "en").flavor_text;
 
     return {
         id,
@@ -78,6 +94,13 @@ async function pokemonToModelDT(pokemonResponse) {
 
 }
 
+async function getAbilityText(a) { //unused
+
+    const response = await (await fetch(a.ability.url)).json();
+    const entry = response.effect_entries.find(entry => entry.language.name === "en");
+    return entry.effect;
+}
+
 
 // DOM Manipulation 
 function createPage(pokemon) {
@@ -88,7 +111,7 @@ function createPage(pokemon) {
     pokemonHeight.innerHTML = `${(pokemon.height * 0.1).toFixed(1)} m`;
     pokemonDescription.innerHTML = pokemon.description;
     pokemon.types.forEach(t => pokemonTypes.innerHTML += `<div style="background-color: var(--${t.type.name})" class="type">${capitalize(t.type.name)}</div>`)
-    pokemon.abilities.forEach((a, index) => index <= 1 ? pokemonAbilities.innerHTML += `<span class="pokemon-ability">${capitalize(a.ability.name)}</span>` : undefined)
+    pokemon.abilities.forEach(async (a, index) => index <= 1 ? pokemonAbilities.innerHTML += `<span class="pokemon-ability">${capitalize(a.ability.name)}</span>` : undefined)
     pokemon.stats.forEach(stat => {
         const statPercentage = (stat.value * 100) / 255;
 
@@ -116,7 +139,6 @@ function createPage(pokemon) {
     const pokemonTypeColorBackground = document.body.querySelectorAll(".pokemon-type-color-background")
     pokemonTypeColorFont.forEach(div => div.style.color = typeColor)
     pokemonTypeColorBackground.forEach(div => div.style.backgroundColor = typeColor)
-
 }
 
 

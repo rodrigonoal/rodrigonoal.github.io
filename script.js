@@ -1,28 +1,30 @@
-let pokemonArray = [];
-let displayedPokemon = [];
-let crescentOrder;
-let alphabetical;
 
+import Dexie from "https://cdn.jsdelivr.net/npm/dexie@3.0.3/dist/dexie.mjs";
+const generationSelect = document.querySelector(".gen-select");
+const searchBox = document.querySelector(".search-box");
 const section = document.querySelector("section");
 const order = document.querySelector(".order");
 const arrow = document.querySelector(".arrow");
-const searchBox = document.querySelector(".search-box");
-const generationSelect = document.querySelector(".gen-select");
 
+let displayedPokemon = [];
+let pokemonArray = [];
+let crescentOrder;
+let alphabetical;
+
+const db = await new Dexie("pokemonDB");
+await createDB(db);
+
+await main();
 
 async function main() {
-    pokemonArray = JSON.parse(localStorage.getItem('pokemonArray'));
+    pokemonArray = await getAllPokemon(db);
 
     if (!pokemonArray || !pokemonArray.lenght) {
         const response = await getPokemon();
         const tempPokemon = await Promise.all(response.results.map(async pokemon => await getPokemon(pokemon.name)));
 
-        pokemonArray = tempPokemon.map(pokemon => {
-            const { id, height, weight, abilities, types, stats, sprites, species } = pokemon;
-            const name = pokemon.name.split('-')[0];
-            return { name, id, height, weight, abilities, types, stats, sprites, species };
-        })
-        localStorage.setItem("pokemonArray", JSON.stringify(pokemonArray));
+        pokemonArray = tempPokemon.map(pokemonDT)
+        await storePokemon(db, pokemonArray)
     }
 
     displayedPokemon = [...pokemonArray]
@@ -30,10 +32,28 @@ async function main() {
     displayPokemon();
 }
 
+// IndexDB
+async function createDB(db) {
+    await db.version(1).stores({ pokemon: "++id,name" })
+}
+
+async function storePokemon(db, array) {
+    await db.pokemon.bulkPut(array);
+}
+
+async function getAllPokemon(db) {
+    await db.open()
+    const gen = findGeneration();
+    const pokemon = await db.pokemon.where("id").between(gen.offset, (gen.offset + gen.limit)).toArray() || null;
+    return pokemon;
+}
+
 
 // Events
 order.addEventListener("click", () => {
     alphabetical = !alphabetical;
+
+    console.log(alphabetical)
 
     displayPokemon();
 })
@@ -239,4 +259,10 @@ function getQueryParams(url) {
         params[key] = decodeURIComponent(val);
     })
     return params;
+}
+
+function pokemonDT(pokemon) {
+    const name = pokemon.name.split('-')[0];
+    const { id, height, weight, abilities, types, stats, sprites, species } = pokemon;
+    return { name, id, height, weight, abilities, types, stats, sprites, species };
 }

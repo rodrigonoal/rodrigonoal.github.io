@@ -9,6 +9,9 @@ body {
   min-height: 100vh;
   min-width: 100vw;
   padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   /* Layout */
   --dark-text: #212121;
