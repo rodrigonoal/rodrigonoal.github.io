@@ -89,8 +89,6 @@ async function findEvolutionChain(descriptionResponse) {
         return { id, name, sprite: response.sprites.front_default }
     }))
 
-    console.log(evolutionChain)
-
     return evolutionChain;
 }
 
