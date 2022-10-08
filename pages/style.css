@@ -133,7 +133,7 @@ a {
   border-radius: 10px;
 }
 
-.subtytle {
+.subtitle {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -260,9 +260,15 @@ a {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  width: 100%;
   flex-wrap: wrap;
   gap: 10px;
+  padding: 5px 0 5px 0;
+  border-top: #eeeeee 1px solid;
+}
 
+#evo-phase-0 {
+  border-top: var(--white-background) 1px solid;
 }
 
 .evo-name {

@@ -101,10 +101,13 @@ async function findEvolutionChain(descriptionResponse) {
                 const vari = await (await fetch(variety.pokemon.url)).json();
                 let variPhase = phaseIndex;
 
-                if (vari.sprites.front_default === null) continue;
-                if (vari.sprites.other['official-artwork'].front_default === null) continue;
                 if (vari.name.includes('-mega') || vari.name.includes('-gmax')) variPhase++;
-                if (vari.name.includes('pikachu') && variPhase === phaseIndex) continue;
+
+                if (vari.sprites.other['official-artwork'].front_default === null ||
+                    (vari.name.includes('rockruff') && variPhase === phaseIndex) ||
+                    (vari.name.includes('pikachu') && variPhase === phaseIndex) ||
+                    vari.name.includes('totem') && variPhase === phaseIndex ||
+                    vari.sprites.front_default === null) continue;
 
                 forms.push({
                     phase: variPhase,
