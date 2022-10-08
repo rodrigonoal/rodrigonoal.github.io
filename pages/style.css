@@ -238,21 +238,31 @@ a {
 
 .pokemon-evolution-chain {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
 }
 
-.pokemon-evolution-chain > a {
+.pokemon-evolution-chain > div > a {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.pokemon-evolution-chain > a > img {
+.pokemon-evolution-chain > div > a > img {
   width: 60px;
   height: 60px;
+}
+
+.evo-phase {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
 }
 
 .evo-name {

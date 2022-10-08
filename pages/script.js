@@ -58,16 +58,20 @@ async function getPokemon(id) {
 async function findEvolutionChain(descriptionResponse) {
     const { chain: chainResponse } = await (await fetch(descriptionResponse.evolution_chain.url)).json();
 
-    function getChain(evolutionChain, chainResponse) {
+
+
+    function getChain(evolutionChain, chainResponse, phase = 0) {
         const { species } = chainResponse;
         const pokemon = species;
         pokemon.id = species.url.split("/")[6];
-        evolutionChain.push(pokemon);
-
+        evolutionChain.push([])
+        evolutionChain[phase].push(pokemon);
+        
+        const newPhase = phase + 1;
         for (let i = 0; i < chainResponse.evolves_to.length; i++) {
             if (chainResponse.evolves_to.length > 0) {
                 const nextPokemon = chainResponse.evolves_to[i];
-                getChain(evolutionChain, nextPokemon);
+                getChain(evolutionChain, nextPokemon, newPhase);
             } else {
                 return;
             }
@@ -76,18 +80,25 @@ async function findEvolutionChain(descriptionResponse) {
 
     let evolutionChain = [];
 
-    getChain(evolutionChain, chainResponse)
+    getChain(evolutionChain, chainResponse);
 
-    evolutionChain = await Promise.all(evolutionChain.map(async pokemon => {
-        const { id, name } = pokemon;
-        response = await getPokemonById(db, id)[0];
+    evolutionChain = await Promise.all(evolutionChain.map(async phase => {
+        if (phase?.length > 0) {
+            const newPhase = await Promise.all(phase.map(async pokemon => {
+                const { id, name } = pokemon;
+                response = await getPokemonById(db, id)[0];
 
-        if (!response) {
-            response = await getPokemon(id);
+                if (!response) {
+                    response = await getPokemon(id);
+                }
+
+                return { id, name, sprite: response.sprites.front_default };
+            }))
+            return newPhase;
         }
-
-        return { id, name, sprite: response.sprites.front_default }
     }))
+
+    evolutionChain = evolutionChain.filter(phase => phase?.length > 0);
 
     return evolutionChain;
 }
@@ -173,19 +184,23 @@ function createPage(pokemon) {
         `
     })
 
-    pokemon.evolutionChain.forEach(evo => {
-        pokemonEvolutionChain.innerHTML += `
-        <a href='details.html?id=${evo.id}'>
-        <img src=${evo.sprite}></img>
-            <div class="evo-name pokemon-type-color-font">
-                ${capitalize(evo.name.split('-')[0])}
-            </div>
-        <a>
-        
-        `
+    pokemon.evolutionChain.forEach((phase, index) => {
+        const phaseId = `evo-phase-${index}`
+        pokemonEvolutionChain.innerHTML += `<div class="evo-phase" id=${phaseId}></div>`
+
+        const pokemonEvolutionPhase = document.querySelector(`#${phaseId}`)
+
+        phase.forEach(evo => {
+            pokemonEvolutionPhase.innerHTML += `
+                <a href='details.html?id=${evo.id}'>
+                <img src=${evo.sprite} alt=${capitalize(evo.name.split('-')[0])}></img>
+                    <div class="evo-name pokemon-type-color-font">
+                        ${capitalize(evo.name.split('-')[0])}
+                    </div>
+                <a>
+                `
+        })
     })
-
-
 
     const typeColor = getTypeColor(pokemon);
     document.body.style.backgroundColor = typeColor;
