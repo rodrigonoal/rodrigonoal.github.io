@@ -139,7 +139,7 @@ function findGeneration() {
     {
         number: 8,
         offset: 809,
-        limit: 96
+        limit: 89
     }];
 
     if (!gen) gen = localStorage.getItem('gen') || 1;

@@ -56,16 +56,23 @@ async function getPokemon(id) {
 };
 
 async function findEvolutionChain(descriptionResponse) {
+    if (!descriptionResponse?.evolution_chain?.url) {
+        return [];
+    }
+
     const { chain: chainResponse } = await (await fetch(descriptionResponse.evolution_chain.url)).json();
+    console.log(chainResponse)
 
     function getChain(evolutionChain, chainResponse) {
         evolutionChain.push(chainResponse.species);
 
-        if (chainResponse.evolves_to.length > 0) {
-            const nextPokemon = chainResponse.evolves_to[0];
-            getChain(evolutionChain, nextPokemon)
-        } else {
-            return;
+        for (let i = 0; i < chainResponse.evolves_to.length; i++) {
+            if (chainResponse.evolves_to.length > 0) {
+                const nextPokemon = chainResponse.evolves_to[i];
+                getChain(evolutionChain, nextPokemon)
+            } else {
+                return;
+            }
         }
     }
 
@@ -74,6 +81,7 @@ async function findEvolutionChain(descriptionResponse) {
     getChain(evolutionChain, chainResponse)
 
     evolutionChain = await Promise.all(evolutionChain.map(async pokemon => {
+        if(pokemon.name === "toxtricity") pokemon.name = "toxtricity-amped"
         const { id, sprites } = await (await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)).json();
         return { id, name: pokemon.name, sprite: sprites.front_default }
     }))
@@ -169,7 +177,7 @@ function createPage(pokemon) {
         <a href='details.html?id=${evo.id}'>
         <img src=${evo.sprite}></img>
             <div class="evo-name pokemon-type-color-font">
-                ${capitalize(evo.name)}
+                ${capitalize(evo.name.split('-')[0])}
             </div>
         <a>
         
