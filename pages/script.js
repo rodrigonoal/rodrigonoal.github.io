@@ -64,9 +64,9 @@ async function findEvolutionChain(descriptionResponse) {
         const { species } = chainResponse;
         const pokemon = species;
         pokemon.id = species.url.split("/")[6];
-        evolutionChain.push([])
+        evolutionChain.push([]);
         evolutionChain[phase].push(pokemon);
-        
+
         const newPhase = phase + 1;
         for (let i = 0; i < chainResponse.evolves_to.length; i++) {
             if (chainResponse.evolves_to.length > 0) {
@@ -82,21 +82,58 @@ async function findEvolutionChain(descriptionResponse) {
 
     getChain(evolutionChain, chainResponse);
 
-    evolutionChain = await Promise.all(evolutionChain.map(async phase => {
-        if (phase?.length > 0) {
-            const newPhase = await Promise.all(phase.map(async pokemon => {
-                const { id, name } = pokemon;
-                response = await getPokemonById(db, id)[0];
+    let forms = [];
 
-                if (!response) {
-                    response = await getPokemon(id);
-                }
+    evolutionChain = await Promise.all(evolutionChain.map(async (phase, phaseIndex) => {
+        const newPhase = await Promise.all(phase.map(async pokemon => {
+            const { id, name } = pokemon;
+            response = await getPokemonById(db, id)[0];
 
-                return { id, name, sprite: response.sprites.front_default };
-            }))
-            return newPhase;
-        }
+            if (!response) {
+                response = await getPokemon(id);
+            }
+
+            let newPokemon = { id, name, sprite: response.sprites.front_default };
+
+            const { varieties } = await (await fetch(response.species.url)).json();
+
+            for (let variety of varieties) {
+                const vari = await (await fetch(variety.pokemon.url)).json();
+                let variPhase = phaseIndex;
+
+                if (vari.sprites.front_default === null) continue;
+                if (vari.sprites.other['official-artwork'].front_default === null) continue;
+                if (vari.name.includes('-mega') || vari.name.includes('-gmax')) variPhase++;
+                if (vari.name.includes('pikachu') && variPhase === phaseIndex) continue;
+
+                forms.push({
+                    phase: variPhase,
+                    id: vari.id,
+                    name: vari.name,
+                    sprite: vari.sprites.front_default
+                });
+            }
+
+
+            return newPokemon;
+        }))
+        return newPhase;
+
     }))
+
+    if (forms.length >= evolutionChain.length) {
+        evolutionChain.push([])
+    }
+
+    evolutionChain = evolutionChain.map((phase, index) => {
+        for (let form of forms) {
+            if (phase?.find(pokemon => pokemon.id == form.id)) continue;
+            if (form.phase === index) {
+                phase.push(form)
+            }
+        }
+        return phase
+    })
 
     evolutionChain = evolutionChain.filter(phase => phase?.length > 0);
 
@@ -155,8 +192,8 @@ async function getAbilityText(a) { //unused
 
 // DOM Manipulation 
 function createPage(pokemon) {
-    pokemonName.innerHTML = capitalize(pokemon.name.split('-')[0]);
-    pokemonId.innerHTML = formatNumber(pokemon.id).padStart(4, '#');
+    pokemonName.innerHTML = pokemon.name.split("-").map(s => capitalize(s)).join(' ');
+    pokemonId.innerHTML = pokemon.id < 898 ? formatNumber(pokemon.id).padStart(4, '#') : '';
     pokemonImage.innerHTML = `<img alt='${pokemon.name}' src='${pokemon.image}'>`;
     pokemonWeight.innerHTML = `${(pokemon.weight * 0.1).toFixed(1)} kg`;
     pokemonHeight.innerHTML = `${(pokemon.height * 0.1).toFixed(1)} m`;
@@ -191,11 +228,12 @@ function createPage(pokemon) {
         const pokemonEvolutionPhase = document.querySelector(`#${phaseId}`)
 
         phase.forEach(evo => {
+            const pokeName = evo.name.split("-").map(s => capitalize(s)).join(' ')
             pokemonEvolutionPhase.innerHTML += `
                 <a href='details.html?id=${evo.id}'>
-                <img src=${evo.sprite} alt=${capitalize(evo.name.split('-')[0])}></img>
+                <img src=${evo.sprite} alt=${pokeName}></img>
                     <div class="evo-name pokemon-type-color-font">
-                        ${capitalize(evo.name.split('-')[0])}
+                        ${pokeName}
                     </div>
                 <a>
                 `
