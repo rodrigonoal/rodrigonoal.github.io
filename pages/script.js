@@ -56,20 +56,18 @@ async function getPokemon(id) {
 };
 
 async function findEvolutionChain(descriptionResponse) {
-    if (!descriptionResponse?.evolution_chain?.url) {
-        return [];
-    }
-
     const { chain: chainResponse } = await (await fetch(descriptionResponse.evolution_chain.url)).json();
-    console.log(chainResponse)
 
     function getChain(evolutionChain, chainResponse) {
-        evolutionChain.push(chainResponse.species);
+        const { species } = chainResponse;
+        const pokemon = species;
+        pokemon.id = species.url.split("/")[6];
+        evolutionChain.push(pokemon);
 
         for (let i = 0; i < chainResponse.evolves_to.length; i++) {
             if (chainResponse.evolves_to.length > 0) {
                 const nextPokemon = chainResponse.evolves_to[i];
-                getChain(evolutionChain, nextPokemon)
+                getChain(evolutionChain, nextPokemon);
             } else {
                 return;
             }
@@ -81,10 +79,17 @@ async function findEvolutionChain(descriptionResponse) {
     getChain(evolutionChain, chainResponse)
 
     evolutionChain = await Promise.all(evolutionChain.map(async pokemon => {
-        if(pokemon.name === "toxtricity") pokemon.name = "toxtricity-amped"
-        const { id, sprites } = await (await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)).json();
-        return { id, name: pokemon.name, sprite: sprites.front_default }
+        const { id, name } = pokemon;
+        response = await getPokemonById(db, id)[0];
+
+        if (!response) {
+            response = await getPokemon(id);
+        }
+
+        return { id, name, sprite: response.sprites.front_default }
     }))
+
+    console.log(evolutionChain)
 
     return evolutionChain;
 }
@@ -96,8 +101,6 @@ async function pokemonToModelDT(pokemonResponse) {
     const description = descriptionResponse.flavor_text_entries.findLast(entry => entry.language.name === "en").flavor_text;
 
     const evolutionChain = await findEvolutionChain(descriptionResponse);
-
-    console.log(evolutionChain)
 
     return {
         id,
