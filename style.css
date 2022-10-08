@@ -50,8 +50,21 @@ header {
   flex-direction: column;
 }
 
+section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+a {
+  all: unset;
+}
+
 input,
-select {
+select,
+button {
   background: var(--white-background);
   border: 1px solid var(--light-text);
   border-radius: 8px;
@@ -106,18 +119,6 @@ select {
 
 .header-lower-part > input {
   width: 100%;
-}
-
-section {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 16px;
-}
-
-a {
-  all: unset;
 }
 
 .card-wrapper {

@@ -9,6 +9,8 @@ body {
   min-height: 100vh;
   min-width: 100vw;
   padding: 24px 16px;
+  display: flex;
+  justify-content: center;
 
   /* Layout */
   --dark-text: #212121;
@@ -42,10 +44,24 @@ body {
   background-color: var(--background);
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 54px;
+  z-index: 1;
+}
+
+a {
+  all: unset;
+  cursor: pointer;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   position: relative;
+  max-width: 360px;
 }
 
 .container > img {
@@ -56,18 +72,6 @@ body {
   width: 208px;
   height: 208px;
   z-index: 0;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 54px;
-  z-index: 1;
-}
-
-a {
-  cursor: pointer;
 }
 
 .pokemon-name {
@@ -102,7 +106,7 @@ a {
   flex-direction: column;
   margin-right: auto;
   margin-left: auto;
-  height: 412px;
+  height: 540px;
   border-radius: 8px;
   padding: 56px 20px 0 20px;
   background-color: var(--white-background);
@@ -230,4 +234,30 @@ a {
 .progress-bar-empty {
   display: flex;
   opacity: 0.2;
+}
+
+.pokemon-evolution-chain {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pokemon-evolution-chain > a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pokemon-evolution-chain > a > img {
+  width: 60px;
+  height: 60px;
+}
+
+.evo-name {
+  display: flex;
+  justify-content: center;
+  width: 36px;
+  font-size: 10px;
+  font-weight: 700;
 }

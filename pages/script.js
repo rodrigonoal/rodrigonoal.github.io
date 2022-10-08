@@ -1,5 +1,6 @@
 import Dexie from "https://cdn.jsdelivr.net/npm/dexie@3.0.3/dist/dexie.mjs";
 
+const pokemonEvolutionChain = document.querySelector(".pokemon-evolution-chain")
 const pokemonDescription = document.querySelector(".pokemon-description")
 const pokemonAbilities = document.querySelector(".pokemon-abilities")
 const pokemonWeight = document.querySelector(".pokemon-weight")
@@ -54,11 +55,41 @@ async function getPokemon(id) {
     return response;
 };
 
+async function findEvolutionChain(descriptionResponse) {
+    const { chain: chainResponse } = await (await fetch(descriptionResponse.evolution_chain.url)).json();
+
+    function getChain(evolutionChain, chainResponse) {
+        evolutionChain.push(chainResponse.species);
+
+        if (chainResponse.evolves_to.length > 0) {
+            const nextPokemon = chainResponse.evolves_to[0];
+            getChain(evolutionChain, nextPokemon)
+        } else {
+            return;
+        }
+    }
+
+    let evolutionChain = [];
+
+    getChain(evolutionChain, chainResponse)
+
+    evolutionChain = await Promise.all(evolutionChain.map(async pokemon => {
+        const { id, sprites } = await (await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)).json();
+        return { id, name: pokemon.name, sprite: sprites.front_default }
+    }))
+
+    return evolutionChain;
+}
+
 async function pokemonToModelDT(pokemonResponse) {
     const { name, id, height, weight, abilities, types, stats } = pokemonResponse;
     const image = pokemonResponse.sprites.other['official-artwork'].front_default;
     const descriptionResponse = await (await fetch(pokemonResponse.species.url)).json();
     const description = descriptionResponse.flavor_text_entries.findLast(entry => entry.language.name === "en").flavor_text;
+
+    const evolutionChain = await findEvolutionChain(descriptionResponse);
+
+    console.log(evolutionChain)
 
     return {
         id,
@@ -89,7 +120,8 @@ async function pokemonToModelDT(pokemonResponse) {
                 name: "spd",
                 value: stats[5].base_stat
             }
-        ]
+        ],
+        evolutionChain
     }
 
 }
@@ -131,6 +163,20 @@ function createPage(pokemon) {
                 </div>
         `
     })
+
+    pokemon.evolutionChain.forEach(evo => {
+        pokemonEvolutionChain.innerHTML += `
+        <a href='details.html?id=${evo.id}'>
+        <img src=${evo.sprite}></img>
+            <div class="evo-name pokemon-type-color-font">
+                ${capitalize(evo.name)}
+            </div>
+        <a>
+        
+        `
+    })
+
+
 
     const typeColor = getTypeColor(pokemon);
     document.body.style.backgroundColor = typeColor;
